@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from random import sample
 from urllib.parse import urlparse
 
 from airflow import DAG
@@ -11,7 +12,7 @@ from review_scrapper import scraper
 current_date = datetime.today().strftime("%Y-%m-%d")
 
 DATABASE_URI = os.getenv("AIRFLOW_CONN_MYSQL_DEFAULT")
-
+SAMPLE_SIZE = 20
 dbc = urlparse(DATABASE_URI)
 
 # Default settings applied to all tasks
@@ -28,7 +29,7 @@ default_args = {
 dag = DAG(
     dag_id="fetch_all_reviews",
     start_date=datetime.today() - timedelta(days=1),
-    schedule_interval="0 0 * * *",
+    schedule_interval="0 */4 * * *",
     default_args=default_args,
 )
 
@@ -62,7 +63,7 @@ def insert_reviews(urls):
     insert_query = (
         """INSERT IGNORE INTO reviews VALUES (Null, %s, %s, %s, %s, %s, %s)"""
     )
-    for url in urls[:2]:  # for test
+    for url in urls:  # for test
         reviews = scraper.get_book_reviews(url[1], url[0])
         reviews = list(reviews)  # params requires a list
         try:
@@ -73,19 +74,22 @@ def insert_reviews(urls):
                 database=dbc.path.lstrip("/"),
             ) as connection:
                 cursor = connection.cursor()
-                cursor.executemany(insert_query, params=reviews)
+                cursor.executemany(insert_query, reviews)
                 cursor.execute(
                     "UPDATE reviews set capture_date = %s where book_id = %s",
                     (current_date, reviews[0][0]),
                 )
                 connection.commit()
+                print("new reviews are logged")
 
         except Error as e:
             print(e)
 
 
 urls = get_urls()
+urls = sample(urls, SAMPLE_SIZE)
+print(urls)
 
 get_reviews = PythonOperator(
-    task_id="fetch_reviews", python_callable=insert_reviews, op_args=urls, dag=dag
+    task_id="fetch_reviews", python_callable=insert_reviews, op_args=[urls], dag=dag
 )

@@ -4,11 +4,46 @@ Airflow is a workflow management system utilizing Directed Acyclic Graphs (DAGS)
 
 In this project, Airflow manages two data sources: reviews of books scrapped from goodreads.com and Segment api that generates website visits.
 
-# Setup 
+# Production Level Setup
 
-We have two different setups, development and production.
+This setup assumes Ubuntu based linux system. Setup a MySQL backend for meta-database with a database client.
+```sql
+CREATE DATABASE airflow_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'airflow_user' IDENTIFIED BY 'airflow_pass';
+GRANT ALL PRIVILEGES ON airflow_db.* TO 'airflow_user';
+```
 
-## Development
+Source the environmental variables with following command:
+
+```bash
+$ source export_env.sh
+```
+
+And then install all the requirements with pip:
+
+```bash
+$ pip install -r requirements.txt
+```
+
+Now, we need to create a user:
+
+```bash
+$ airflow users create \
+    --username admin \
+    --firstname onur \
+    --lastname tunali \
+    --role Admin \
+    --email or.tunali+dev@gmail.com
+    -- password 9047
+```
+
+and finally initialize database:
+
+```bash
+airflow db init
+```
+
+# Development
 
 Development setup is in the local machine. For local development, we need to export all environment variables in `.env` file. Following shell script exports all (one should note that this approach doesn't work with variables who has spaces):
 
