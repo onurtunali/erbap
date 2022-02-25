@@ -1,0 +1,77 @@
+{% extends 'default.html' %}
+{% block content %}
+<div class="container">
+
+    <div class="card mb-3 mt-2">
+
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#info">Info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#trends">Trends</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#recommendations">Recommendations</a>
+                </li>
+            </ul>
+        </div>
+        <!-- INFO content -->
+        <div class="tab-content card-body">
+            <div id="info" class="tab-pane active">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <img src="{{book['cover']}}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <!-- <div class="card-body"> -->
+                        <h2 class="card-title">{{book['book_title']}}</h2>
+                        <h5 class="card-subtitle mb-2 text-muted">{{book['author_name']}}</h5>
+                        <p class="card-text" style="text-align: justify;"><b>Description:</b>
+                            {{book['book_description']}}
+                        </p>
+                        <p class="card-text"><b>Publication Year:</b> {{book['year_published']}}</p>
+                        <p class="card-text"><b>Genres:</b> {{book['genres']}}</p>
+                        <p class="card-text"><b>Rating:</b> {{book['rating_score']}}</p>
+                        <p class="card-text"><small class="text-muted">Last reviewed on {{book['date']}}</small></p>
+                        <!-- </div> -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TREND content -->
+            <div id="trends" class="tab-pane">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <img src="{{book['cover']}}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <h2 class="card-title">Average Rating trends</h2>
+                        <div id="my_dataviz"></div>
+                        <script defer type="text/javascript" api_url={{ url_for("book.ratings", id=book['id']) }}
+                            src="/static/rating_drawing.js"></script>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECOMMENDATION content -->
+            <div id="recommendations" class="tab-pane" style="height: 700;">
+                <div class="row g-4">
+                    <iframe
+                        src="https://share.streamlit.io/onurtunali/scifi-rec/main/?book_title={{book['book_title']}}"
+                        width="800" height="1800"></iframe>
+                    <!-- 
+                    <div class="col-md-3">
+                        <img src="{{book['cover']}}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+
+                </div> -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

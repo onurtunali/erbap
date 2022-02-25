@@ -1,0 +1,60 @@
+{% extends 'default.html' %}
+
+{% block content %}
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <h2 class="pb-2 border-bottom"></h2>
+
+        <div class="row">
+            <div class="col-6">
+                <h1>Results: </h1>
+            </div>
+
+            <div class="container">
+                <table class="table table-sm table-hover table-borderless justify-content-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Cover</th>
+                            <th scope="col">Authors</th>
+                            <th scope="col">Genres</th>
+                            <th scope="col">Language</th>
+                            <th scope="col">Rating</th>
+                            <th scope="col">Votes</th>
+                            <th scope="col">Date</th>
+                            <th scope="col" class="text-end">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for book in books %}
+
+                        <tr>
+                            <th scope="row">{{ book['id'] }}</th>
+                            <td>{{ book['book_title'] }}</td>
+                            <td><img src="{{ book['cover'] }}" width="100"></td>
+                            <td>{{ book['author_name'] }}</td>
+                            <td>{{ book['genres'] }}</td>
+                            <td>{{ book['edition_language'] }}</td>
+                            <td>{{ book['rating_score'] }}</td>
+                            <td>{{ book['rating_votes'] }}</td>
+                            <td>{{ book['year_published'] }}</td>
+                            <td class="text-end">
+                                <a href={{ url_for("book.view", id=book['id']) }} type="button"
+                                    class="btn btn-light btn-small"><i class="bi bi-eye"></i>
+                                    View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
