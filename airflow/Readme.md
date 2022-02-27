@@ -2,15 +2,36 @@
 
 Airflow is a workflow management system utilizing Directed Acyclic Graphs (DAGS) to connect various tasks together. Main advantage of using Airflow is writing the tasks in python scripts which can be deployed easily by uploading them to the Airflow. 
 
-In this project, Airflow manages two data sources: reviews of books scrapped from goodreads.com and Segment api that generates website visits.
+In this project, Airflow manages two data sources: reviews of books scrapped from [goodreads](www.goodreads.com) and Segment API that generates website visits.
 
-# Production Level Setup
+# Development and Production Level Setup
+
+For local development and test, we can use development setup and for operational processes airflow can be deployed to a cloud machine or VPS.
+
+## Development
+
+Development setup is in the local machine. For local development, we need to export all environment variables in `.env` file. Following shell script exports all (one should note that this approach doesn't work with variables who has spaces):
+
+```sh
+#!/bin/sh
+#source this file
+export $(xargs < .env)
+```
+
+Run `source export_env` before installing airflow.
 
 This setup assumes Ubuntu based linux system. Setup a MySQL backend for meta-database with a database client.
+
 ```sql
 CREATE DATABASE airflow_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'airflow_user' IDENTIFIED BY 'airflow_pass';
 GRANT ALL PRIVILEGES ON airflow_db.* TO 'airflow_user';
+```
+
+Add database MySQL URI as environment variable to `.env` file as 
+
+```bash
+AIRFLOW__CORE__SQL_ALCHEMY_CONN=+mysqlconnector://airflow_user:airflow_pass@<database_url>:3306/airflow_db
 ```
 
 Source the environmental variables with following command:
@@ -33,8 +54,8 @@ $ airflow users create \
     --firstname onur \
     --lastname tunali \
     --role Admin \
-    --email or.tunali+dev@gmail.com
-    -- password 9047
+    --email <email>
+    -- password <password>
 ```
 
 and finally initialize database:
@@ -43,30 +64,9 @@ and finally initialize database:
 airflow db init
 ```
 
-# Development
-
-Development setup is in the local machine. For local development, we need to export all environment variables in `.env` file. Following shell script exports all (one should note that this approach doesn't work with variables who has spaces):
-
-```sh
-#!/bin/sh
-#source this file
-export $(xargs < .env)
-```
-
-Run `source export_env` before installing airflow.
-
-
 ## Production
 
-Production setup is in Heroku PaaS. New version of SQLAlchemy uses `postgresql` instead of `postgres` in database URI and Heroku stills uses the first version in free tier PostgresSql database example. That's why there are some conflict with dependencies. After installing airflow, following libraries should be anchored to previous version in `requirement.txt`:
-
-```
-SQLAlchemy==1.3.24
-MarkupSafe==2.0.1
-```
-
-In addition, Heroku provide `DATABASE_URI` environment variable and this needs to be copied to `AIRFLOW__CORE__SQL_ALCHEMY_CONN` secret in Heroku dashboard.
-
+Production setup is the same as development, however it's in Heroku PaaS. Heroku provides `DATABASE_URI` environment variable for a free tier PostgreSql database back-end. This needs to be copied to `AIRFLOW__CORE__SQL_ALCHEMY_CONN` secret in Heroku dashboard if one chooses to use that database.
 
 As a side note, Heroku bash shell is ephemeral meaning when connected with 
 
